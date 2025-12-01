@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bryn Mawr Alumna to Feature on New Japanese Bill</title>
+    <style>
+        body {
+            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+            line-height: 1.8;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* コントロールパネル（固定ヘッダー） */
+        .controls {
+            position: sticky;
+            top: 0;
+            background-color: #ffffff;
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .toggle-container {
+            display: inline-flex;
+            background: #eee;
+            border-radius: 25px;
+            padding: 4px;
+            position: relative;
+        }
+
+        .toggle-input {
+            display: none;
+        }
+
+        .toggle-label {
+            padding: 8px 20px;
+            cursor: pointer;
+            z-index: 2;
+            font-weight: bold;
+            font-size: 14px;
+            color: #777;
+            transition: color 0.3s;
+        }
+
+        .toggle-bg {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            height: calc(100% - 8px);
+            width: 50%;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            z-index: 1;
+        }
+
+        /* スイッチの状態制御 */
+        #mode-para:checked~.toggle-bg {
+            transform: translateX(0);
+        }
+
+        #mode-para:checked+label {
+            color: #2c3e50;
+        }
+
+        #mode-sent:checked~.toggle-bg {
+            transform: translateX(100%);
+            /* 幅の分だけ移動 */
+        }
+
+        #mode-sent:checked+label {
+            color: #2c3e50;
+        }
+
+        /* メインコンテンツエリア */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 40px;
+            margin-top: 20px;
+            margin-bottom: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        header {
+            border-bottom: 2px solid #eaeaea;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            letter-spacing: -0.5px;
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: 400;
+            color: #555;
+            margin-top: 0;
+            font-style: italic;
+        }
+
+        .byline {
+            font-size: 14px;
+            color: #777;
+            margin-top: 10px;
+            display: block;
+        }
+
+        /* 重要単語のスタイル */
+        b {
+            color: #d35400;
+            background-color: rgba(211, 84, 0, 0.08);
+            padding: 0 2px;
+            border-radius: 3px;
+            font-weight: 700;
+        }
+
+        /* 翻訳スタイルの共通設定 */
+        .trans-text {
+            color: #555;
+            font-size: 0.9em;
+            background-color: #f9f9f9;
+            border-left: 3px solid #b0c4de;
+            padding: 8px 12px;
+            margin-top: 8px;
+            margin-bottom: 15px;
+            display: none;
+            /* デフォルトは非表示、JS/CSSで制御 */
+        }
+
+        /* --- モード別の挙動制御 --- */
+
+        /* 段落モード (.view-paragraph) */
+        .view-paragraph .sentence-unit {
+            display: inline;
+            /* 文を続けて表示 */
+        }
+
+        .view-paragraph .trans-sentence {
+            display: none;
+            /* 文ごとの翻訳は消す */
+        }
+
+        .view-paragraph .trans-block {
+            display: block;
+            /* 段落ごとの翻訳を表示 */
+            margin-top: 20px;
+        }
+
+        .view-paragraph .paragraph-wrapper {
+            margin-bottom: 40px;
+        }
+
+        /* 一文モード (.view-sentence) */
+        .view-sentence .sentence-unit {
+            display: block;
+            /* 文ごとに改行 */
+            margin-bottom: 20px;
+        }
+
+        .view-sentence .trans-sentence {
+            display: block;
+            /* 文ごとの翻訳を表示 */
+        }
+
+        .view-sentence .trans-block {
+            display: none;
+            /* 段落ごとの翻訳は消す */
+        }
+
+        .view-sentence .paragraph-wrapper {
+            margin-bottom: 0;
+            /* 文ごとのマージンで調整するので段落マージンは減らす */
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- コントロールエリア -->
+    <div class="controls">
+        <div class="toggle-container">
+            <input type="radio" id="mode-para" name="view-mode" class="toggle-input" checked
+                onchange="changeMode('paragraph')">
+            <label for="mode-para" class="toggle-label">段落ごとに訳</label>
+
+            <input type="radio" id="mode-sent" name="view-mode" class="toggle-input" onchange="changeMode('sentence')">
+            <label for="mode-sent" class="toggle-label">一文ごとに訳</label>
+
+            <div class="toggle-bg"></div>
+        </div>
+    </div>
+
+    <div class="container view-paragraph" id="content-area">
+        <header>
+            <h1>Bryn Mawr <b>Alumna</b> to Feature on New Japanese Bill</h1>
+            <h2>— <b>Hidden</b> links between US and Japan —</h2>
+            <span class="byline">By Jeffrey Malcolm</span>
+        </header>
+
+        <article>
+            <!-- Paragraph 1 -->
+            <div class="paragraph-wrapper">
+                <span class="sentence-unit">
+                    A Bryn Mawr <b>alumna</b> who went on to become a <b>pioneer</b> for women’s higher education in her
+                    native Japan is to be <b>commemorated</b> with an appearance on a new banknote.
+                    <div class="trans-text trans-sentence">母国日本で女性の高等教育のパイオニアとなったブリンマー大学の卒業生が、新紙幣の肖像として記念されることになった。
+                    </div>
+                </span>
+                <div class="trans-text trans-block">
+                    <strong>【訳】</strong> 母国日本で女性の高等教育のパイオニアとなったブリンマー大学の卒業生が、新紙幣の肖像として記念されることになった。
+                </div>
+            </div>
+
+            <!-- Paragraph 2 -->
+            <div class="paragraph-wrapper">
+                <span class="sentence-unit">
+                    Umeko Tsuda, who studied at the famous women’s college in Pennsylvania from 1889 to 1892, is being
+                    remembered for her leading role in helping to <b>bring about</b> social <b>reform</b> in Japan.
+                    <div class="trans-text trans-sentence">
+                        1889年から1892年までペンシルバニア州の有名な女子大学で学んだ津田梅子は、日本における社会改革の実現に主導的な役割を果たした人物として記憶されている。</div>
+                </span>
+                <span class="sentence-unit">
+                    Tsuda and her <b>supporters</b> <b>founded</b> a scholarship to help <b>strengthen</b>
+                    <b>connections</b> between the US and Japan in women’s higher education.
+                    <div class="trans-text trans-sentence">津田と支持者たちは、女性の高等教育における日米間の結びつきを強化するための奨学金を設立した。</div>
+                </span>
+                <span class="sentence-unit">
+                    She also established a leading <b>institute</b> for women’s education in her home city of Tokyo.
+                    <div class="trans-text trans-sentence">彼女はまた、故郷である東京に女性教育のための主要な機関を設立した。</div>
+                </span>
+                <div class="trans-text trans-block">
+                    <strong>【訳】</strong>
+                    1889年から1892年までペンシルバニア州の有名な女子大学で学んだ津田梅子は、日本における社会改革の実現に主導的な役割を果たした人物として記憶されている。津田と支持者たちは、女性の高等教育における日米間の結びつきを強化するための奨学金を設立した。彼女はまた、故郷である東京に女性教育のための主要な機関を設立した。
+                </div>
+            </div>
+
+            <!-- Paragraph 3 -->
+            <div class="paragraph-wrapper">
+                <span class="sentence-unit">
+                    In the first <b>redesign</b> of Japanese banknotes in two decades, Tsuda’s image is set to appear on
+                    a new 5,000 yen banknote.
+                    <div class="trans-text trans-sentence">20年ぶりとなる日本の紙幣刷新において、津田の肖像画は新5000円札に採用されることになった。</div>
+                </span>
+                <span class="sentence-unit">
+                    <b>Industrialist</b> Eiichi Shibusawa, and scientist Shibasaburo Kitasato are the other two
+                    <b>historical</b> figures to be <b>commemorated</b> on the new bills which are being released in
+                    Japan’s new Reiwa <b>era</b>.
+                    <div class="trans-text trans-sentence">
+                        実業家の渋沢栄一と科学者の北里柴三郎も、日本の新しい「令和」の時代に発行される新紙幣で記念される他の2人の歴史的人物である。</div>
+                </span>
+                <div class="trans-text trans-block">
+                    <strong>【訳】</strong>
+                    20年ぶりとなる日本の紙幣刷新において、津田の肖像画は新5000円札に採用されることになった。実業家の渋沢栄一と科学者の北里柴三郎も、日本の新しい「令和」の時代に発行される新紙幣で記念される他の2人の歴史的人物である。
+                </div>
+            </div>
+
+            <!-- Paragraph 4 -->
+            <div class="paragraph-wrapper">
+                <span class="sentence-unit">
+                    Tsuda’s story is a fascinating tale that saw social <b>reforms</b> in the US play an important role
+                    in the <b>modernization</b> of Japan.
+                    <div class="trans-text trans-sentence">津田の物語は、米国の社会改革が日本の近代化に重要な役割を果たしたという魅力的な話である。</div>
+                </span>
+                <span class="sentence-unit">
+                    Nowadays in Japan, almost half of all undergraduates are female.
+                    <div class="trans-text trans-sentence">現在の日本では、学部生のほぼ半数が女性である。</div>
+                </span>
+                <span class="sentence-unit">
+                    However, the world Tsuda was born into in 1864 was very different.
+                    <div class="trans-text trans-sentence">しかし、津田が生まれた1864年の世界は全く異なっていた。</div>
+                </span>
+                <div class="trans-text trans-block">
+                    <strong>【訳】</strong>
+                    津田の物語は、米国の社会改革が日本の近代化に重要な役割を果たしたという魅力的な話である。現在の日本では、学部生のほぼ半数が女性である。しかし、津田が生まれた1864年の世界は全く異なっていた。
+                </div>
+            </div>
+
+            <!-- Paragraph 5 -->
+            <div class="paragraph-wrapper">
+                <span class="sentence-unit">
+                    When she was just six years old, Tsuda—a daughter of a public official—was sent by the Japanese
+                    government to be <b>educated</b> in the US.
+                    <div class="trans-text trans-sentence">わずか6歳の時、官僚の娘であった津田は、米国で教育を受けるために日本政府によって派遣された。</div>
+                </span>
+                <span class="sentence-unit">
+                    At the same time in Japan a school system based on the US and European model was being established,
+                    but the majority of girls did not attend even elementary school.
+                    <div class="trans-text trans-sentence">当時、日本では欧米モデルに基づいた学校制度が設立されつつあったが、大多数の女子は小学校にさえ通っていなかった。</div>
+                </span>
+                <span class="sentence-unit">
+                    In addition, secondary education for girls was almost <b>non-existent</b>.
+                    <div class="trans-text trans-sentence">さらに、女子のための中等教育はほぼ存在しなかった。</div>
+                </span>
+                <div class="trans-text trans-block">
+                    <strong>【訳】</strong>
+                    わずか6歳の時、官僚の娘であった津田は、米国で教育を受けるために日本政府によって派遣された。当時、日本では欧米モデルに基づいた学校制度が設立されつつあったが、大多数の女子は小学校にさえ通っていなかった。さらに、女子のための中等教育はほぼ存在しなかった。
+                </div>
+            </div>
+
+            <!-- Paragraph 6 -->
+            <div class="paragraph-wrapper">
+                <span class="sentence-unit">
+                    The Japanese government believed that by sending girls like Tsuda to grow up in the US they would be
+                    able to help their Japanese “sisters” when they returned to Japan and help <b>modernize</b> Japan as
+                    a whole.
+                    <div class="trans-text trans-sentence">
+                        日本政府は、津田のような少女たちを米国で育てることによって、帰国時に彼女たちが日本の「姉妹たち」を助け、日本全体の近代化に貢献できるだろうと考えていた。</div>
+                </span>
+                <span class="sentence-unit">
+                    Tsuda lived with an American family in <b>Washington, D.C.</b> until she was 17, at which point she
+                    returned to Japan.
+                    <div class="trans-text trans-sentence">津田は17歳になるまでワシントンD.C.のアメリカ人家庭で暮らし、その時点で日本に帰国した。</div>
+                </span>
+                <span class="sentence-unit">
+                    The teenage Tsuda was shocked as life in Japan was very different from the American life she had
+                    grown up in.
+                    <div class="trans-text trans-sentence">10代の津田は、日本の生活が自分が育ったアメリカの生活とはあまりに異なっていたため衝撃を受けた。</div>
+                </span>
+                <span class="sentence-unit">
+                    While support for the higher education of women was growing in the US, only around 30 percent of
+                    girls in Japan attended even elementary school by 1890.
+                    <div class="trans-text trans-sentence">
+                        米国では女性の高等教育への支援が高まっていた一方で、1890年までに小学校に通っていた日本の女子はわずか約30パーセントに過ぎなかった。</div>
+                </span>
+                <div class="trans-text trans-block">
+                    <strong>【訳】</strong>
+                    日本政府は、津田のような少女たちを米国で育てることによって、帰国時に彼女たちが日本の「姉妹たち」を助け、日本全体の近代化に貢献できるだろうと考えていた。津田は17歳になるまでワシントンD.C.のアメリカ人家庭で暮らし、その時点で日本に帰国した。10代の津田は、日本の生活が自分が育ったアメリカの生活とはあまりに異なっていたため衝撃を受けた。米国では女性の高等教育への支援が高まっていた一方で、1890年までに小学校に通っていた日本の女子はわずか約30パーセントに過ぎなかった。
+                </div>
+            </div>
+
+            <!-- Paragraph 7 -->
+            <div class="paragraph-wrapper">
+                <span class="sentence-unit">
+                    Tsuda began to feel that Japanese women should have the opportunity to experience the same freedoms
+                    and the same education that she had received.
+                    <div class="trans-text trans-sentence">津田は、日本の女性も自分が受けたのと同じ自由と同じ教育を経験する機会を持つべきだと感じ始めた。</div>
+                </span>
+                <span class="sentence-unit">
+                    Her <b>dissatisfaction</b> with life back in Japan led to her return to the US in her
+                    <b>mid-twenties</b>.
+                    <div class="trans-text trans-sentence">日本での生活に対する不満が、20代半ばでの米国への再渡航につながった。</div>
+                </span>
+                <span class="sentence-unit">
+                    During her time at Bryn Mawr, she majored in <b>biology</b>.
+                    <div class="trans-text trans-sentence">ブリンマー大学在籍中、彼女は生物学を専攻した。</div>
+                </span>
+                <span class="sentence-unit">
+                    She also went on speaking tours around the US to raise awareness of the lack of higher education for
+                    Japanese women.
+                    <div class="trans-text trans-sentence">また、日本の女性に対する高等教育の欠如についての認識を高めるために、全米各地で講演旅行を行った。</div>
+                </span>
+                <span class="sentence-unit">
+                    Tsuda used these tours to raise money to establish a scholarship for Japanese women to study
+                    overseas.
+                    <div class="trans-text trans-sentence">津田はこれらのツアーを利用して、日本人女性が海外留学するための奨学金を設立するための資金を集めた。</div>
+                </span>
+                <span class="sentence-unit">
+                    Her scholarship would <b>run for</b> more than 80 years.
+                    <div class="trans-text trans-sentence">彼女の奨学金は80年以上続くことになった。</div>
+                </span>
+                <div class="trans-text trans-block">
+                    <strong>【訳】</strong>
+                    津田は、日本の女性も自分が受けたのと同じ自由と同じ教育を経験する機会を持つべきだと感じ始めた。日本での生活に対する不満が、20代半ばでの米国への再渡航につながった。ブリンマー大学在籍中、彼女は生物学を専攻した。また、日本の女性に対する高等教育の欠如についての認識を高めるために、全米各地で講演旅行を行った。津田はこれらのツアーを利用して、日本人女性が海外留学するための奨学金を設立するための資金を集めた。彼女の奨学金は80年以上続くことになった。
+                </div>
+            </div>
+
+            <!-- Paragraph 8 -->
+            <div class="paragraph-wrapper">
+                <span class="sentence-unit">
+                    Returning once again to Japan, she began teaching and continued giving speeches.
+                    <div class="trans-text trans-sentence">再び日本に戻ると、彼女は教育活動を始め、講演も続けた。</div>
+                </span>
+                <span class="sentence-unit">
+                    She also started Tsuda College, which later became today’s Tsuda University in Tokyo—a
+                    <b>prestigious</b> higher education <b>institute</b> for women.
+                    <div class="trans-text trans-sentence">彼女はまた、後に東京にある現在の津田塾大学となる津田カレッジを創設した。これは女性のための権威ある高等教育機関である。
+                    </div>
+                </span>
+                <div class="trans-text trans-block">
+                    <strong>【訳】</strong>
+                    再び日本に戻ると、彼女は教育活動を始め、講演も続けた。彼女はまた、後に東京にある現在の津田塾大学となる津田カレッジを創設した。これは女性のための権威ある高等教育機関である。
+                </div>
+            </div>
+
+            <!-- Paragraph 9 -->
+            <div class="paragraph-wrapper">
+                <span class="sentence-unit">
+                    Though she passed away in 1929, Tsuda <b>left behind</b> a <b>legacy</b> of higher education for
+                    women and a strong <b>bond</b> between the US and Japan.
+                    <div class="trans-text trans-sentence">1929年に亡くなったが、津田は女性のための高等教育という遺産と、日米間の強い絆を残した。</div>
+                </span>
+                <span class="sentence-unit">
+                    The decision of the Japanese government to honor her places Tsuda <b>alongside</b> other Bryn Mawr
+                    alumnae with international <b>recognition</b>, including the Academy Award winning actor Katharine
+                    Hepburn and the Nobel Peace Prize winner Emily Greene Balch.
+                    <div class="trans-text trans-sentence">
+                        日本政府が彼女を称えるという決定は、アカデミー賞受賞俳優のキャサリン・ヘプバーンやノーベル平和賞受賞者のエミリー・グリーン・バルチなど、国際的に認められた他のブリンマー大学卒業生と並ぶ位置に津田を置くことになる。
+                    </div>
+                </span>
+                <div class="trans-text trans-block">
+                    <strong>【訳】</strong>
+                    1929年に亡くなったが、津田は女性のための高等教育という遺産と、日米間の強い絆を残した。日本政府が彼女を称えるという決定は、アカデミー賞受賞俳優のキャサリン・ヘプバーンやノーベル平和賞受賞者のエミリー・グリーン・バルチなど、国際的に認められた他のブリンマー大学卒業生と並ぶ位置に津田を置くことになる。
+                </div>
+            </div>
+
+            <!-- Paragraph 10 -->
+            <div class="paragraph-wrapper">
+                <span class="sentence-unit">
+                    The new banknotes featuring Tsuda are scheduled for release in 2024.
+                    <div class="trans-text trans-sentence">津田を描いた新紙幣は2024年に発行される予定である。</div>
+                </span>
+                <div class="trans-text trans-block">
+                    <strong>【訳】</strong> 津田を描いた新紙幣は2024年に発行される予定である。
+                </div>
+            </div>
+        </article>
+    </div>
+
+    <script>
+        function changeMode(mode) {
+            const contentArea = document.getElementById('content-area');
+            if (mode === 'paragraph') {
+                contentArea.classList.remove('view-sentence');
+                contentArea.classList.add('view-paragraph');
+            } else {
+                contentArea.classList.remove('view-paragraph');
+                contentArea.classList.add('view-sentence');
+            }
+        }
+    </script>
+
+</body>
+
+</html>
