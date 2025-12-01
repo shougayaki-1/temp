@@ -1,0 +1,264 @@
+/* =========================================
+   Base Variables & Reset (css/style.css相当)
+   ========================================= */
+:root {
+    /* Colors based on the Report */
+    --color-primary: #00aeef;
+    /* UNICEF Cyan */
+    --color-primary-dark: #0077b5;
+    --color-text: #333333;
+    --color-text-light: #666666;
+    --color-bg: #f4f7f9;
+    --color-white: #ffffff;
+
+    /* Section Theme Colors */
+    --color-intro: #0099d6;
+    --color-mental: #f7941d;
+    /* Orange */
+    --color-physical: #00a99d;
+    /* Teal/Green */
+    --color-skills: #ffc20e;
+    /* Yellow/Gold */
+    --color-conclusion: #374ea2;
+    /* Dark Blue */
+    --color-appendix: #7f7f7f;
+    /* Gray */
+
+    /* Typography */
+    --font-main: 'Noto Sans JP', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-main);
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    line-height: 1.6;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* =========================================
+   Portal Specific Styles (css/portal.css)
+   ========================================= */
+
+/* Header */
+.site-header {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    padding: 15px 0;
+}
+
+.logo-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 700;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-intro) 100%);
+    color: var(--color-white);
+    padding: 80px 0 60px;
+    margin-bottom: 40px;
+    clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+    /* 斜めのカットデザイン */
+}
+
+.main-title {
+    font-size: 3rem;
+    line-height: 1.2;
+    margin-bottom: 20px;
+}
+
+.subtitle {
+    font-size: 1.5rem;
+    font-weight: 400;
+    opacity: 0.9;
+}
+
+.lead-text {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 30px;
+    opacity: 0.9;
+    letter-spacing: 0.05em;
+}
+
+.description {
+    max-width: 700px;
+    font-size: 1rem;
+    line-height: 1.8;
+}
+
+/* Grid Layout */
+.chapter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+    padding-bottom: 80px;
+}
+
+/* Card Design */
+.chapter-card {
+    background: var(--color-white);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    border-top: 5px solid transparent;
+    /* テーマカラー用のボーダー */
+}
+
+.chapter-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.card-link {
+    display: block;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-header {
+    padding: 25px 25px 10px;
+}
+
+.chapter-num {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-light);
+    display: block;
+    margin-bottom: 5px;
+}
+
+.card-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.card-body {
+    padding: 0 25px 25px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card-body p {
+    font-size: 0.95rem;
+    color: var(--color-text-light);
+    margin-bottom: 20px;
+}
+
+.read-more {
+    font-weight: 700;
+    font-size: 0.9rem;
+    align-self: flex-start;
+    transition: margin-left 0.2s;
+}
+
+.chapter-card:hover .read-more {
+    margin-left: 5px;
+    /* ホバー時に矢印が動くアニメーション */
+}
+
+/* Card Theme Colors */
+.card-intro {
+    border-color: var(--color-intro);
+}
+
+.card-intro .read-more,
+.card-intro .chapter-num {
+    color: var(--color-intro);
+}
+
+.card-mental {
+    border-color: var(--color-mental);
+}
+
+.card-mental .read-more,
+.card-mental .chapter-num {
+    color: var(--color-mental);
+}
+
+.card-physical {
+    border-color: var(--color-physical);
+}
+
+.card-physical .read-more,
+.card-physical .chapter-num {
+    color: var(--color-physical);
+}
+
+.card-skills {
+    border-color: var(--color-skills);
+}
+
+.card-skills .read-more,
+.card-skills .chapter-num {
+    color: var(--color-skills);
+}
+
+.card-conclusion {
+    border-color: var(--color-conclusion);
+}
+
+.card-conclusion .read-more,
+.card-conclusion .chapter-num {
+    color: var(--color-conclusion);
+}
+
+.card-appendix {
+    border-color: var(--color-appendix);
+}
+
+.card-appendix .read-more,
+.card-appendix .chapter-num {
+    color: var(--color-appendix);
+}
+
+/* Footer */
+.site-footer {
+    background-color: #eef2f5;
+    text-align: center;
+    padding: 40px 0;
+    color: var(--color-text-light);
+    font-size: 0.9rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .main-title {
+        font-size: 2rem;
+    }
+
+    .hero-section {
+        padding: 40px 0 50px;
+        clip-path: none;
+    }
+
+    .chapter-grid {
+        grid-template-columns: 1fr;
+    }
+}
