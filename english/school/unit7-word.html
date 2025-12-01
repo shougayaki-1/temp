@@ -4,446 +4,811 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bryn Mawr Alumna to Feature on New Japanese Bill</title>
+    <title>Lesson 4 & Reading Material Study App</title>
     <style>
+        :root {
+            --bg-color: #f2f2f7;
+            /* iOS Light Gray Background */
+            --card-bg: #ffffff;
+            --text-main: #1c1c1e;
+            --text-sub: #8e8e93;
+            --accent-color: #007aff;
+            /* Apple Blue */
+            --accent-bg: rgba(0, 122, 255, 0.1);
+            --highlight-orange: #ff9500;
+            --highlight-orange-bg: rgba(255, 149, 0, 0.1);
+            --border-radius: 16px;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --box-blank-bg: #e5e5ea;
+            --box-blank-hover: #d1d1d6;
+        }
+
         body {
-            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
-            line-height: 1.8;
-            background-color: #f4f4f9;
-            color: #333;
+            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
             margin: 0;
             padding: 0;
+            line-height: 1.6;
         }
 
-        /* コントロールパネル（固定ヘッダー） */
-        .controls {
+        /* --- Global Navigation (Tabs) --- */
+        .app-header {
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             position: sticky;
             top: 0;
-            background-color: #ffffff;
-            padding: 15px 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            z-index: 100;
-            text-align: center;
-            border-bottom: 1px solid #ddd;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 0.8rem 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
         }
 
-        .toggle-container {
-            display: inline-flex;
-            background: #eee;
-            border-radius: 25px;
-            padding: 4px;
-            position: relative;
-        }
-
-        .toggle-input {
-            display: none;
-        }
-
-        .toggle-label {
-            padding: 8px 20px;
+        .nav-btn {
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-sub);
+            padding: 8px 16px;
             cursor: pointer;
-            z-index: 2;
-            font-weight: bold;
-            font-size: 14px;
-            color: #777;
+            position: relative;
             transition: color 0.3s;
         }
 
-        .toggle-bg {
+        .nav-btn.active {
+            color: var(--text-main);
+        }
+
+        .nav-btn.active::after {
+            content: '';
             position: absolute;
-            top: 4px;
-            left: 4px;
-            height: calc(100% - 8px);
+            bottom: -13px;
+            /* Header padding adjustment */
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--accent-color);
+            border-radius: 3px 3px 0 0;
+        }
+
+        /* --- Layout Containers --- */
+        .container {
+            max-width: 1100px;
+            margin: 20px auto;
+            padding: 0 20px;
+            display: flex;
+            gap: 20px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .main-card {
+            flex: 3;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 40px;
+            min-height: 60vh;
+        }
+
+        .sidebar {
+            flex: 1;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            height: fit-content;
+            position: sticky;
+            top: 90px;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+            display: none;
+            /* Only visible in Test Mode by JS */
+        }
+
+        /* --- Control Bar (Sub-mode Toggles) --- */
+        .control-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .page-title {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--text-main);
+        }
+
+        /* iOS Style Segmented Control */
+        .segmented-control {
+            background-color: #e5e5ea;
+            border-radius: 8px;
+            padding: 2px;
+            display: inline-flex;
+            position: relative;
+        }
+
+        .segmented-control input {
+            display: none;
+        }
+
+        .segmented-control label {
+            padding: 6px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            z-index: 2;
+            color: var(--text-main);
+            transition: color 0.2s;
+            border-radius: 6px;
+        }
+
+        .segmented-bg {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            height: calc(100% - 4px);
             width: 50%;
-            background: #fff;
-            border-radius: 20px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
+            /* Assumes 2 options */
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             z-index: 1;
         }
 
-        /* スイッチの状態制御 */
-        #mode-para:checked~.toggle-bg {
+        /* Toggle Logic */
+        #opt1:checked~.segmented-bg {
             transform: translateX(0);
         }
 
-        #mode-para:checked+label {
-            color: #2c3e50;
-        }
-
-        #mode-sent:checked~.toggle-bg {
+        #opt2:checked~.segmented-bg {
             transform: translateX(100%);
-            /* 幅の分だけ移動 */
         }
 
-        #mode-sent:checked+label {
-            color: #2c3e50;
+        /* Reuse logic for second toggle group */
+        #opt-t1:checked~.segmented-bg {
+            transform: translateX(0);
         }
 
-        /* メインコンテンツエリア */
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: #ffffff;
-            padding: 40px;
-            margin-top: 20px;
-            margin-bottom: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        #opt-t2:checked~.segmented-bg {
+            transform: translateX(100%);
         }
 
-        header {
-            border-bottom: 2px solid #eaeaea;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
+        .btn-reset {
+            background-color: transparent;
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
-            color: #2c3e50;
-            letter-spacing: -0.5px;
+        .btn-reset:hover {
+            background-color: var(--accent-bg);
         }
 
-        h2 {
-            font-size: 18px;
-            font-weight: 400;
-            color: #555;
+        /* --- Reading Mode Content Styles --- */
+        .reading-content h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .reading-content h2 {
+            font-size: 16px;
+            font-weight: normal;
+            color: var(--text-sub);
             margin-top: 0;
             font-style: italic;
         }
 
         .byline {
             font-size: 14px;
-            color: #777;
-            margin-top: 10px;
+            color: var(--text-sub);
+            margin-bottom: 30px;
             display: block;
         }
 
-        /* 重要単語のスタイル */
-        b {
+        .important-word {
             color: #d35400;
             background-color: rgba(211, 84, 0, 0.08);
-            padding: 0 2px;
-            border-radius: 3px;
+            padding: 0 3px;
+            border-radius: 4px;
             font-weight: 700;
         }
 
-        /* 翻訳スタイルの共通設定 */
-        .trans-text {
+        .trans-box {
+            background-color: #f9f9fb;
+            border-left: 4px solid #c7c7cc;
+            padding: 10px 15px;
+            margin: 10px 0 25px 0;
+            font-size: 0.95rem;
             color: #555;
-            font-size: 0.9em;
-            background-color: #f9f9f9;
-            border-left: 3px solid #b0c4de;
-            padding: 8px 12px;
-            margin-top: 8px;
-            margin-bottom: 15px;
-            display: none;
-            /* デフォルトは非表示、JS/CSSで制御 */
+            border-radius: 0 8px 8px 0;
         }
 
-        /* --- モード別の挙動制御 --- */
-
-        /* 段落モード (.view-paragraph) */
+        /* Reading View Modes */
         .view-paragraph .sentence-unit {
             display: inline;
-            /* 文を続けて表示 */
         }
 
         .view-paragraph .trans-sentence {
             display: none;
-            /* 文ごとの翻訳は消す */
         }
 
         .view-paragraph .trans-block {
             display: block;
-            /* 段落ごとの翻訳を表示 */
-            margin-top: 20px;
         }
 
         .view-paragraph .paragraph-wrapper {
-            margin-bottom: 40px;
+            margin-bottom: 2em;
         }
 
-        /* 一文モード (.view-sentence) */
         .view-sentence .sentence-unit {
             display: block;
-            /* 文ごとに改行 */
-            margin-bottom: 20px;
+            margin-bottom: 1em;
         }
 
         .view-sentence .trans-sentence {
             display: block;
-            /* 文ごとの翻訳を表示 */
+            margin-top: 0.5em;
+            margin-bottom: 1.5em;
         }
 
         .view-sentence .trans-block {
             display: none;
-            /* 段落ごとの翻訳は消す */
         }
 
-        .view-sentence .paragraph-wrapper {
-            margin-bottom: 0;
-            /* 文ごとのマージンで調整するので段落マージンは減らす */
+        /* --- Test Mode Styles --- */
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-top: 40px;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .question-block {
+            margin-bottom: 25px;
+        }
+
+        .jp-text {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .en-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        /* TEST BLANK BOX STYLES (Hitbox Improvement) */
+        .blank-box {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 80px;
+            height: 32px;
+            padding: 0 10px;
+            margin: 0 4px;
+            background-color: var(--box-blank-bg);
+            border-radius: 6px;
+            color: transparent;
+            /* Text hidden initially */
+            font-weight: bold;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            vertical-align: middle;
+            user-select: none;
+            position: relative;
+        }
+
+        .blank-box:hover {
+            background-color: var(--box-blank-hover);
+        }
+
+        .blank-box.revealed {
+            background-color: var(--accent-bg);
+            color: var(--accent-color);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Word List Sidebar Items */
+        .word-list-item {
+            padding: 6px 10px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .word-list-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #eee;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                padding: 10px;
+            }
+
+            .main-card {
+                padding: 20px;
+            }
+
+            .sidebar {
+                position: static;
+                max-height: 200px;
+                order: 2;
+                /* Put below content on mobile */
+            }
         }
     </style>
 </head>
 
 <body>
 
-    <!-- コントロールエリア -->
-    <div class="controls">
-        <div class="toggle-container">
-            <input type="radio" id="mode-para" name="view-mode" class="toggle-input" checked
-                onchange="changeMode('paragraph')">
-            <label for="mode-para" class="toggle-label">段落ごとに訳</label>
+    <!-- Tab Navigation -->
+    <header class="app-header">
+        <button class="nav-btn active" onclick="switchTab('reading')" id="tab-reading">本文 (Reading)</button>
+        <button class="nav-btn" onclick="switchTab('test')" id="tab-test">単語テスト (Test)</button>
+    </header>
 
-            <input type="radio" id="mode-sent" name="view-mode" class="toggle-input" onchange="changeMode('sentence')">
-            <label for="mode-sent" class="toggle-label">一文ごとに訳</label>
+    <div class="container">
+        <!-- Main Content Card -->
+        <main class="main-card" id="main-content">
+            <!-- Content Injected via JS -->
+        </main>
 
-            <div class="toggle-bg"></div>
-        </div>
-    </div>
-
-    <div class="container view-paragraph" id="content-area">
-        <header>
-            <h1>Bryn Mawr <b>Alumna</b> to Feature on New Japanese Bill</h1>
-            <h2>— <b>Hidden</b> links between US and Japan —</h2>
-            <span class="byline">By Jeffrey Malcolm</span>
-        </header>
-
-        <article>
-            <!-- Paragraph 1 -->
-            <div class="paragraph-wrapper">
-                <span class="sentence-unit">
-                    A Bryn Mawr <b>alumna</b> who went on to become a <b>pioneer</b> for women’s higher education in her
-                    native Japan is to be <b>commemorated</b> with an appearance on a new banknote.
-                    <div class="trans-text trans-sentence">母国日本で女性の高等教育のパイオニアとなったブリンマー大学の卒業生が、新紙幣の肖像として記念されることになった。
-                    </div>
-                </span>
-                <div class="trans-text trans-block">
-                    <strong>【訳】</strong> 母国日本で女性の高等教育のパイオニアとなったブリンマー大学の卒業生が、新紙幣の肖像として記念されることになった。
-                </div>
-            </div>
-
-            <!-- Paragraph 2 -->
-            <div class="paragraph-wrapper">
-                <span class="sentence-unit">
-                    Umeko Tsuda, who studied at the famous women’s college in Pennsylvania from 1889 to 1892, is being
-                    remembered for her leading role in helping to <b>bring about</b> social <b>reform</b> in Japan.
-                    <div class="trans-text trans-sentence">
-                        1889年から1892年までペンシルバニア州の有名な女子大学で学んだ津田梅子は、日本における社会改革の実現に主導的な役割を果たした人物として記憶されている。</div>
-                </span>
-                <span class="sentence-unit">
-                    Tsuda and her <b>supporters</b> <b>founded</b> a scholarship to help <b>strengthen</b>
-                    <b>connections</b> between the US and Japan in women’s higher education.
-                    <div class="trans-text trans-sentence">津田と支持者たちは、女性の高等教育における日米間の結びつきを強化するための奨学金を設立した。</div>
-                </span>
-                <span class="sentence-unit">
-                    She also established a leading <b>institute</b> for women’s education in her home city of Tokyo.
-                    <div class="trans-text trans-sentence">彼女はまた、故郷である東京に女性教育のための主要な機関を設立した。</div>
-                </span>
-                <div class="trans-text trans-block">
-                    <strong>【訳】</strong>
-                    1889年から1892年までペンシルバニア州の有名な女子大学で学んだ津田梅子は、日本における社会改革の実現に主導的な役割を果たした人物として記憶されている。津田と支持者たちは、女性の高等教育における日米間の結びつきを強化するための奨学金を設立した。彼女はまた、故郷である東京に女性教育のための主要な機関を設立した。
-                </div>
-            </div>
-
-            <!-- Paragraph 3 -->
-            <div class="paragraph-wrapper">
-                <span class="sentence-unit">
-                    In the first <b>redesign</b> of Japanese banknotes in two decades, Tsuda’s image is set to appear on
-                    a new 5,000 yen banknote.
-                    <div class="trans-text trans-sentence">20年ぶりとなる日本の紙幣刷新において、津田の肖像画は新5000円札に採用されることになった。</div>
-                </span>
-                <span class="sentence-unit">
-                    <b>Industrialist</b> Eiichi Shibusawa, and scientist Shibasaburo Kitasato are the other two
-                    <b>historical</b> figures to be <b>commemorated</b> on the new bills which are being released in
-                    Japan’s new Reiwa <b>era</b>.
-                    <div class="trans-text trans-sentence">
-                        実業家の渋沢栄一と科学者の北里柴三郎も、日本の新しい「令和」の時代に発行される新紙幣で記念される他の2人の歴史的人物である。</div>
-                </span>
-                <div class="trans-text trans-block">
-                    <strong>【訳】</strong>
-                    20年ぶりとなる日本の紙幣刷新において、津田の肖像画は新5000円札に採用されることになった。実業家の渋沢栄一と科学者の北里柴三郎も、日本の新しい「令和」の時代に発行される新紙幣で記念される他の2人の歴史的人物である。
-                </div>
-            </div>
-
-            <!-- Paragraph 4 -->
-            <div class="paragraph-wrapper">
-                <span class="sentence-unit">
-                    Tsuda’s story is a fascinating tale that saw social <b>reforms</b> in the US play an important role
-                    in the <b>modernization</b> of Japan.
-                    <div class="trans-text trans-sentence">津田の物語は、米国の社会改革が日本の近代化に重要な役割を果たしたという魅力的な話である。</div>
-                </span>
-                <span class="sentence-unit">
-                    Nowadays in Japan, almost half of all undergraduates are female.
-                    <div class="trans-text trans-sentence">現在の日本では、学部生のほぼ半数が女性である。</div>
-                </span>
-                <span class="sentence-unit">
-                    However, the world Tsuda was born into in 1864 was very different.
-                    <div class="trans-text trans-sentence">しかし、津田が生まれた1864年の世界は全く異なっていた。</div>
-                </span>
-                <div class="trans-text trans-block">
-                    <strong>【訳】</strong>
-                    津田の物語は、米国の社会改革が日本の近代化に重要な役割を果たしたという魅力的な話である。現在の日本では、学部生のほぼ半数が女性である。しかし、津田が生まれた1864年の世界は全く異なっていた。
-                </div>
-            </div>
-
-            <!-- Paragraph 5 -->
-            <div class="paragraph-wrapper">
-                <span class="sentence-unit">
-                    When she was just six years old, Tsuda—a daughter of a public official—was sent by the Japanese
-                    government to be <b>educated</b> in the US.
-                    <div class="trans-text trans-sentence">わずか6歳の時、官僚の娘であった津田は、米国で教育を受けるために日本政府によって派遣された。</div>
-                </span>
-                <span class="sentence-unit">
-                    At the same time in Japan a school system based on the US and European model was being established,
-                    but the majority of girls did not attend even elementary school.
-                    <div class="trans-text trans-sentence">当時、日本では欧米モデルに基づいた学校制度が設立されつつあったが、大多数の女子は小学校にさえ通っていなかった。</div>
-                </span>
-                <span class="sentence-unit">
-                    In addition, secondary education for girls was almost <b>non-existent</b>.
-                    <div class="trans-text trans-sentence">さらに、女子のための中等教育はほぼ存在しなかった。</div>
-                </span>
-                <div class="trans-text trans-block">
-                    <strong>【訳】</strong>
-                    わずか6歳の時、官僚の娘であった津田は、米国で教育を受けるために日本政府によって派遣された。当時、日本では欧米モデルに基づいた学校制度が設立されつつあったが、大多数の女子は小学校にさえ通っていなかった。さらに、女子のための中等教育はほぼ存在しなかった。
-                </div>
-            </div>
-
-            <!-- Paragraph 6 -->
-            <div class="paragraph-wrapper">
-                <span class="sentence-unit">
-                    The Japanese government believed that by sending girls like Tsuda to grow up in the US they would be
-                    able to help their Japanese “sisters” when they returned to Japan and help <b>modernize</b> Japan as
-                    a whole.
-                    <div class="trans-text trans-sentence">
-                        日本政府は、津田のような少女たちを米国で育てることによって、帰国時に彼女たちが日本の「姉妹たち」を助け、日本全体の近代化に貢献できるだろうと考えていた。</div>
-                </span>
-                <span class="sentence-unit">
-                    Tsuda lived with an American family in <b>Washington, D.C.</b> until she was 17, at which point she
-                    returned to Japan.
-                    <div class="trans-text trans-sentence">津田は17歳になるまでワシントンD.C.のアメリカ人家庭で暮らし、その時点で日本に帰国した。</div>
-                </span>
-                <span class="sentence-unit">
-                    The teenage Tsuda was shocked as life in Japan was very different from the American life she had
-                    grown up in.
-                    <div class="trans-text trans-sentence">10代の津田は、日本の生活が自分が育ったアメリカの生活とはあまりに異なっていたため衝撃を受けた。</div>
-                </span>
-                <span class="sentence-unit">
-                    While support for the higher education of women was growing in the US, only around 30 percent of
-                    girls in Japan attended even elementary school by 1890.
-                    <div class="trans-text trans-sentence">
-                        米国では女性の高等教育への支援が高まっていた一方で、1890年までに小学校に通っていた日本の女子はわずか約30パーセントに過ぎなかった。</div>
-                </span>
-                <div class="trans-text trans-block">
-                    <strong>【訳】</strong>
-                    日本政府は、津田のような少女たちを米国で育てることによって、帰国時に彼女たちが日本の「姉妹たち」を助け、日本全体の近代化に貢献できるだろうと考えていた。津田は17歳になるまでワシントンD.C.のアメリカ人家庭で暮らし、その時点で日本に帰国した。10代の津田は、日本の生活が自分が育ったアメリカの生活とはあまりに異なっていたため衝撃を受けた。米国では女性の高等教育への支援が高まっていた一方で、1890年までに小学校に通っていた日本の女子はわずか約30パーセントに過ぎなかった。
-                </div>
-            </div>
-
-            <!-- Paragraph 7 -->
-            <div class="paragraph-wrapper">
-                <span class="sentence-unit">
-                    Tsuda began to feel that Japanese women should have the opportunity to experience the same freedoms
-                    and the same education that she had received.
-                    <div class="trans-text trans-sentence">津田は、日本の女性も自分が受けたのと同じ自由と同じ教育を経験する機会を持つべきだと感じ始めた。</div>
-                </span>
-                <span class="sentence-unit">
-                    Her <b>dissatisfaction</b> with life back in Japan led to her return to the US in her
-                    <b>mid-twenties</b>.
-                    <div class="trans-text trans-sentence">日本での生活に対する不満が、20代半ばでの米国への再渡航につながった。</div>
-                </span>
-                <span class="sentence-unit">
-                    During her time at Bryn Mawr, she majored in <b>biology</b>.
-                    <div class="trans-text trans-sentence">ブリンマー大学在籍中、彼女は生物学を専攻した。</div>
-                </span>
-                <span class="sentence-unit">
-                    She also went on speaking tours around the US to raise awareness of the lack of higher education for
-                    Japanese women.
-                    <div class="trans-text trans-sentence">また、日本の女性に対する高等教育の欠如についての認識を高めるために、全米各地で講演旅行を行った。</div>
-                </span>
-                <span class="sentence-unit">
-                    Tsuda used these tours to raise money to establish a scholarship for Japanese women to study
-                    overseas.
-                    <div class="trans-text trans-sentence">津田はこれらのツアーを利用して、日本人女性が海外留学するための奨学金を設立するための資金を集めた。</div>
-                </span>
-                <span class="sentence-unit">
-                    Her scholarship would <b>run for</b> more than 80 years.
-                    <div class="trans-text trans-sentence">彼女の奨学金は80年以上続くことになった。</div>
-                </span>
-                <div class="trans-text trans-block">
-                    <strong>【訳】</strong>
-                    津田は、日本の女性も自分が受けたのと同じ自由と同じ教育を経験する機会を持つべきだと感じ始めた。日本での生活に対する不満が、20代半ばでの米国への再渡航につながった。ブリンマー大学在籍中、彼女は生物学を専攻した。また、日本の女性に対する高等教育の欠如についての認識を高めるために、全米各地で講演旅行を行った。津田はこれらのツアーを利用して、日本人女性が海外留学するための奨学金を設立するための資金を集めた。彼女の奨学金は80年以上続くことになった。
-                </div>
-            </div>
-
-            <!-- Paragraph 8 -->
-            <div class="paragraph-wrapper">
-                <span class="sentence-unit">
-                    Returning once again to Japan, she began teaching and continued giving speeches.
-                    <div class="trans-text trans-sentence">再び日本に戻ると、彼女は教育活動を始め、講演も続けた。</div>
-                </span>
-                <span class="sentence-unit">
-                    She also started Tsuda College, which later became today’s Tsuda University in Tokyo—a
-                    <b>prestigious</b> higher education <b>institute</b> for women.
-                    <div class="trans-text trans-sentence">彼女はまた、後に東京にある現在の津田塾大学となる津田カレッジを創設した。これは女性のための権威ある高等教育機関である。
-                    </div>
-                </span>
-                <div class="trans-text trans-block">
-                    <strong>【訳】</strong>
-                    再び日本に戻ると、彼女は教育活動を始め、講演も続けた。彼女はまた、後に東京にある現在の津田塾大学となる津田カレッジを創設した。これは女性のための権威ある高等教育機関である。
-                </div>
-            </div>
-
-            <!-- Paragraph 9 -->
-            <div class="paragraph-wrapper">
-                <span class="sentence-unit">
-                    Though she passed away in 1929, Tsuda <b>left behind</b> a <b>legacy</b> of higher education for
-                    women and a strong <b>bond</b> between the US and Japan.
-                    <div class="trans-text trans-sentence">1929年に亡くなったが、津田は女性のための高等教育という遺産と、日米間の強い絆を残した。</div>
-                </span>
-                <span class="sentence-unit">
-                    The decision of the Japanese government to honor her places Tsuda <b>alongside</b> other Bryn Mawr
-                    alumnae with international <b>recognition</b>, including the Academy Award winning actor Katharine
-                    Hepburn and the Nobel Peace Prize winner Emily Greene Balch.
-                    <div class="trans-text trans-sentence">
-                        日本政府が彼女を称えるという決定は、アカデミー賞受賞俳優のキャサリン・ヘプバーンやノーベル平和賞受賞者のエミリー・グリーン・バルチなど、国際的に認められた他のブリンマー大学卒業生と並ぶ位置に津田を置くことになる。
-                    </div>
-                </span>
-                <div class="trans-text trans-block">
-                    <strong>【訳】</strong>
-                    1929年に亡くなったが、津田は女性のための高等教育という遺産と、日米間の強い絆を残した。日本政府が彼女を称えるという決定は、アカデミー賞受賞俳優のキャサリン・ヘプバーンやノーベル平和賞受賞者のエミリー・グリーン・バルチなど、国際的に認められた他のブリンマー大学卒業生と並ぶ位置に津田を置くことになる。
-                </div>
-            </div>
-
-            <!-- Paragraph 10 -->
-            <div class="paragraph-wrapper">
-                <span class="sentence-unit">
-                    The new banknotes featuring Tsuda are scheduled for release in 2024.
-                    <div class="trans-text trans-sentence">津田を描いた新紙幣は2024年に発行される予定である。</div>
-                </span>
-                <div class="trans-text trans-block">
-                    <strong>【訳】</strong> 津田を描いた新紙幣は2024年に発行される予定である。
-                </div>
-            </div>
-        </article>
+        <!-- Sidebar (Only for Test Mode) -->
+        <aside class="sidebar" id="sidebar">
+            <div class="word-list-header">Word List <small>(Q1 & Q2)</small></div>
+            <div id="word-list-container"></div>
+        </aside>
     </div>
 
     <script>
-        function changeMode(mode) {
-            const contentArea = document.getElementById('content-area');
-            if (mode === 'paragraph') {
-                contentArea.classList.remove('view-sentence');
-                contentArea.classList.add('view-paragraph');
+        // --- DATA SECTION ---
+
+        // 1. Reading Content Data
+        // 【訳】という文字を削除しました。
+        const readingData = `
+            <header>
+                <h1>Bryn Mawr <b class="important-word">Alumna</b> to Feature on New Japanese Bill</h1>
+                <h2>— <b class="important-word">Hidden</b> links between US and Japan —</h2>
+                <span class="byline">By Jeffrey Malcolm</span>
+            </header>
+            <article>
+                <div class="paragraph-wrapper">
+                    <span class="sentence-unit">
+                        A Bryn Mawr <b class="important-word">alumna</b> who went on to become a <b class="important-word">pioneer</b> for women’s higher education in her native Japan is to be <b class="important-word">commemorated</b> with an appearance on a new banknote.
+                        <div class="trans-box trans-sentence">母国日本で女性の高等教育のパイオニアとなったブリンマー大学の卒業生が、新紙幣の肖像として記念されることになった。</div>
+                    </span>
+                    <div class="trans-box trans-block">
+                        母国日本で女性の高等教育のパイオニアとなったブリンマー大学の卒業生が、新紙幣の肖像として記念されることになった。
+                    </div>
+                </div>
+
+                <div class="paragraph-wrapper">
+                    <span class="sentence-unit">
+                        Umeko Tsuda, who studied at the famous women’s college in Pennsylvania from 1889 to 1892, is being remembered for her leading role in helping to <b class="important-word">bring about</b> social <b class="important-word">reform</b> in Japan.
+                        <div class="trans-box trans-sentence">1889年から1892年までペンシルバニア州の有名な女子大学で学んだ津田梅子は、日本における社会改革の実現に主導的な役割を果たした人物として記憶されている。</div>
+                    </span>
+                    <span class="sentence-unit">
+                        Tsuda and her <b class="important-word">supporters</b> <b class="important-word">founded</b> a scholarship to help <b class="important-word">strengthen</b> <b class="important-word">connections</b> between the US and Japan in women’s higher education.
+                        <div class="trans-box trans-sentence">津田と支持者たちは、女性の高等教育における日米間の結びつきを強化するための奨学金を設立した。</div>
+                    </span>
+                    <span class="sentence-unit">
+                        She also established a leading <b class="important-word">institute</b> for women’s education in her home city of Tokyo.
+                        <div class="trans-box trans-sentence">彼女はまた、故郷である東京に女性教育のための主要な機関を設立した。</div>
+                    </span>
+                    <div class="trans-box trans-block">
+                        1889年から1892年までペンシルバニア州の有名な女子大学で学んだ津田梅子は、日本における社会改革の実現に主導的な役割を果たした人物として記憶されている。津田と支持者たちは、女性の高等教育における日米間の結びつきを強化するための奨学金を設立した。彼女はまた、故郷である東京に女性教育のための主要な機関を設立した。
+                    </div>
+                </div>
+
+                <div class="paragraph-wrapper">
+                    <span class="sentence-unit">
+                        In the first <b class="important-word">redesign</b> of Japanese banknotes in two decades, Tsuda’s image is set to appear on a new 5,000 yen banknote.
+                        <div class="trans-box trans-sentence">20年ぶりとなる日本の紙幣刷新において、津田の肖像画は新5000円札に採用されることになった。</div>
+                    </span>
+                    <span class="sentence-unit">
+                        <b class="important-word">Industrialist</b> Eiichi Shibusawa, and scientist Shibasaburo Kitasato are the other two <b class="important-word">historical</b> figures to be <b class="important-word">commemorated</b> on the new bills which are being released in Japan’s new Reiwa <b class="important-word">era</b>.
+                        <div class="trans-box trans-sentence">実業家の渋沢栄一と科学者の北里柴三郎も、日本の新しい「令和」の時代に発行される新紙幣で記念される他の2人の歴史的人物である。</div>
+                    </span>
+                    <div class="trans-box trans-block">
+                        20年ぶりとなる日本の紙幣刷新において、津田の肖像画は新5000円札に採用されることになった。実業家の渋沢栄一と科学者の北里柴三郎も、日本の新しい「令和」の時代に発行される新紙幣で記念される他の2人の歴史的人物である。
+                    </div>
+                </div>
+
+                <div class="paragraph-wrapper">
+                    <span class="sentence-unit">
+                        Tsuda’s story is a fascinating tale that saw social <b class="important-word">reforms</b> in the US play an important role in the <b class="important-word">modernization</b> of Japan.
+                        <div class="trans-box trans-sentence">津田の物語は、米国の社会改革が日本の近代化に重要な役割を果たしたという魅力的な話である。</div>
+                    </span>
+                    <span class="sentence-unit">
+                        Nowadays in Japan, almost half of all undergraduates are female.
+                        <div class="trans-box trans-sentence">現在の日本では、学部生のほぼ半数が女性である。</div>
+                    </span>
+                    <span class="sentence-unit">
+                        However, the world Tsuda was born into in 1864 was very different.
+                        <div class="trans-box trans-sentence">しかし、津田が生まれた1864年の世界は全く異なっていた。</div>
+                    </span>
+                    <div class="trans-box trans-block">
+                        津田の物語は、米国の社会改革が日本の近代化に重要な役割を果たしたという魅力的な話である。現在の日本では、学部生のほぼ半数が女性である。しかし、津田が生まれた1864年の世界は全く異なっていた。
+                    </div>
+                </div>
+
+                <div class="paragraph-wrapper">
+                    <span class="sentence-unit">
+                        When she was just six years old, Tsuda—a daughter of a public official—was sent by the Japanese government to be <b class="important-word">educated</b> in the US.
+                        <div class="trans-box trans-sentence">わずか6歳の時、官僚の娘であった津田は、米国で教育を受けるために日本政府によって派遣された。</div>
+                    </span>
+                    <span class="sentence-unit">
+                        At the same time in Japan a school system based on the US and European model was being established, but the majority of girls did not attend even elementary school.
+                        <div class="trans-box trans-sentence">当時、日本では欧米モデルに基づいた学校制度が設立されつつあったが、大多数の女子は小学校にさえ通っていなかった。</div>
+                    </span>
+                    <span class="sentence-unit">
+                        In addition, secondary education for girls was almost <b class="important-word">non-existent</b>.
+                        <div class="trans-box trans-sentence">さらに、女子のための中等教育はほぼ存在しなかった。</div>
+                    </span>
+                    <div class="trans-box trans-block">
+                        わずか6歳の時、官僚の娘であった津田は、米国で教育を受けるために日本政府によって派遣された。当時、日本では欧米モデルに基づいた学校制度が設立されつつあったが、大多数の女子は小学校にさえ通っていなかった。さらに、女子のための中等教育はほぼ存在しなかった。
+                    </div>
+                </div>
+                 
+                <div class="paragraph-wrapper">
+                    <span class="sentence-unit">
+                         The Japanese government believed that by sending girls like Tsuda to grow up in the US they would be able to help their Japanese “sisters” when they returned to Japan and help <b class="important-word">modernize</b> Japan as a whole.
+                        <div class="trans-box trans-sentence">日本政府は、津田のような少女たちを米国で育てることによって、帰国時に彼女たちが日本の「姉妹たち」を助け、日本全体の近代化に貢献できるだろうと考えていた。</div>
+                    </span>
+                    <span class="sentence-unit">
+                        Tsuda lived with an American family in <b class="important-word">Washington, D.C.</b> until she was 17, at which point she returned to Japan.
+                        <div class="trans-box trans-sentence">津田は17歳になるまでワシントンD.C.のアメリカ人家庭で暮らし、その時点で日本に帰国した。</div>
+                    </span>
+                    <span class="sentence-unit">
+                         The teenage Tsuda was shocked as life in Japan was very different from the American life she had grown up in.
+                        <div class="trans-box trans-sentence">10代の津田は、日本の生活が自分が育ったアメリカの生活とはあまりに異なっていたため衝撃を受けた。</div>
+                    </span>
+                     <span class="sentence-unit">
+                        While support for the higher education of women was growing in the US, only around 30 percent of girls in Japan attended even elementary school by 1890.
+                        <div class="trans-box trans-sentence">米国では女性の高等教育への支援が高まっていた一方で、1890年までに小学校に通っていた日本の女子はわずか約30パーセントに過ぎなかった。</div>
+                    </span>
+                    <div class="trans-box trans-block">
+                        日本政府は、津田のような少女たちを米国で育てることによって、帰国時に彼女たちが日本の「姉妹たち」を助け、日本全体の近代化に貢献できるだろうと考えていた。津田は17歳になるまでワシントンD.C.のアメリカ人家庭で暮らし、その時点で日本に帰国した。10代の津田は、日本の生活が自分が育ったアメリカの生活とはあまりに異なっていたため衝撃を受けた。米国では女性の高等教育への支援が高まっていた一方で、1890年までに小学校に通っていた日本の女子はわずか約30パーセントに過ぎなかった。
+                    </div>
+                </div>
+
+                <div class="paragraph-wrapper">
+                    <span class="sentence-unit">
+                        Tsuda began to feel that Japanese women should have the opportunity to experience the same freedoms and the same education that she had received.
+                        <div class="trans-box trans-sentence">津田は、日本の女性も自分が受けたのと同じ自由と同じ教育を経験する機会を持つべきだと感じ始めた。</div>
+                    </span>
+                    <span class="sentence-unit">
+                        Her <b class="important-word">dissatisfaction</b> with life back in Japan led to her return to the US in her <b class="important-word">mid-twenties</b>.
+                        <div class="trans-box trans-sentence">日本での生活に対する不満が、20代半ばでの米国への再渡航につながった。</div>
+                    </span>
+                    <span class="sentence-unit">
+                        During her time at Bryn Mawr, she majored in <b class="important-word">biology</b>.
+                        <div class="trans-box trans-sentence">ブリンマー大学在籍中、彼女は生物学を専攻した。</div>
+                    </span>
+                    <span class="sentence-unit">
+                        She also went on speaking tours around the US to raise awareness of the lack of higher education for Japanese women.
+                        <div class="trans-box trans-sentence">また、日本の女性に対する高等教育の欠如についての認識を高めるために、全米各地で講演旅行を行った。</div>
+                    </span>
+                    <span class="sentence-unit">
+                         Tsuda used these tours to raise money to establish a scholarship for Japanese women to study overseas.
+                        <div class="trans-box trans-sentence">津田はこれらのツアーを利用して、日本人女性が海外留学するための奨学金を設立するための資金を集めた。</div>
+                    </span>
+                    <span class="sentence-unit">
+                         Her scholarship would <b class="important-word">run for</b> more than 80 years.
+                        <div class="trans-box trans-sentence">彼女の奨学金は80年以上続くことになった。</div>
+                    </span>
+                    <div class="trans-box trans-block">
+                        津田は、日本の女性も自分が受けたのと同じ自由と同じ教育を経験する機会を持つべきだと感じ始めた。日本での生活に対する不満が、20代半ばでの米国への再渡航につながった。ブリンマー大学在籍中、彼女は生物学を専攻した。また、日本の女性に対する高等教育の欠如についての認識を高めるために、全米各地で講演旅行を行った。津田はこれらのツアーを利用して、日本人女性が海外留学するための奨学金を設立するための資金を集めた。彼女の奨学金は80年以上続くことになった。
+                    </div>
+                </div>
+                
+                 <div class="paragraph-wrapper">
+                    <span class="sentence-unit">
+                        Returning once again to Japan, she began teaching and continued giving speeches.
+                        <div class="trans-box trans-sentence">再び日本に戻ると、彼女は教育活動を始め、講演も続けた。</div>
+                    </span>
+                    <span class="sentence-unit">
+                        She also started Tsuda College, which later became today’s Tsuda University in Tokyo—a <b class="important-word">prestigious</b> higher education <b class="important-word">institute</b> for women.
+                        <div class="trans-box trans-sentence">彼女はまた、後に東京にある現在の津田塾大学となる津田カレッジを創設した。これは女性のための権威ある高等教育機関である。</div>
+                    </span>
+                    <div class="trans-box trans-block">
+                        再び日本に戻ると、彼女は教育活動を始め、講演も続けた。彼女はまた、後に東京にある現在の津田塾大学となる津田カレッジを創設した。これは女性のための権威ある高等教育機関である。
+                    </div>
+                </div>
+
+                <div class="paragraph-wrapper">
+                    <span class="sentence-unit">
+                        Though she passed away in 1929, Tsuda <b class="important-word">left behind</b> a <b class="important-word">legacy</b> of higher education for women and a strong <b class="important-word">bond</b> between the US and Japan.
+                        <div class="trans-box trans-sentence">1929年に亡くなったが、津田は女性のための高等教育という遺産と、日米間の強い絆を残した。</div>
+                    </span>
+                    <span class="sentence-unit">
+                        The decision of the Japanese government to honor her places Tsuda <b class="important-word">alongside</b> other Bryn Mawr alumnae with international <b class="important-word">recognition</b>, including the Academy Award winning actor Katharine Hepburn and the Nobel Peace Prize winner Emily Greene Balch.
+                        <div class="trans-box trans-sentence">日本政府が彼女を称えるという決定は、アカデミー賞受賞俳優のキャサリン・ヘプバーンやノーベル平和賞受賞者のエミリー・グリーン・バルチなど、国際的に認められた他のブリンマー大学卒業生と並ぶ位置に津田を置くことになる。</div>
+                    </span>
+                    <div class="trans-box trans-block">
+                        1929年に亡くなったが、津田は女性のための高等教育という遺産と、日米間の強い絆を残した。日本政府が彼女を称えるという決定は、アカデミー賞受賞俳優のキャサリン・ヘプバーンやノーベル平和賞受賞者のエミリー・グリーン・バルチなど、国際的に認められた他のブリンマー大学卒業生と並ぶ位置に津田を置くことになる。
+                    </div>
+                </div>
+
+                <div class="paragraph-wrapper">
+                    <span class="sentence-unit">
+                        The new banknotes featuring Tsuda are scheduled for release in 2024.
+                        <div class="trans-box trans-sentence">津田を描いた新紙幣は2024年に発行される予定である。</div>
+                    </span>
+                    <div class="trans-box trans-block">
+                        津田を描いた新紙幣は2024年に発行される予定である。
+                    </div>
+                </div>
+            </article>
+        `;
+
+        // 2. Test Data
+        const testWordList = [
+            "accidental", "achievement", "antibiotics", "available", "bacteria-killing",
+            "bacterial", "contaminated", "cultivating", "cure", "deadly", "desire",
+            "discovery", "Egyptian", "founding father", "humble", "infected", "injury",
+            "laboratory", "large-scale", "London", "microorganism", "mold", "moldy",
+            "multiply", "obtained", "penicillin", "penicillium", "notatum", "Petri dish",
+            "pneumonia", "respiratory", "retirement", "revolutionize", "Scottish",
+            "skin", "substance", "wound"
+        ];
+
+        const testQuestions = {
+            q1: [
+                { jp: "アレクサンダー・フレミングは、抗生物質の生みの親である。", en: "Alexander Fleming is the <span class='blank-box' data-ans='founding father'></span> of <span class='blank-box' data-ans='antibiotics'></span>." },
+                { jp: "ペニシリンが発見される前は、感染症を治す方法がなかったため、ちょっとした切り傷でも、感染してしまうと、死に至るほど深刻な状態になる可能性があった。", en: "Before penicillin there was no way to <span class='blank-box' data-ans='cure'></span> infections, and so even a little cut, if it got <span class='blank-box' data-ans='infected'></span>, could turn into something serious enough to kill you." },
+                { jp: "フレミングには家業に携わりたいという願望はほとんどなかった。", en: "Fleming showed little <span class='blank-box' data-ans='desire'></span> to join the family business." },
+                { jp: "その皿の中で、フレミングは細菌をよりよく理解するために、細菌を培養していたのだ。", en: "In the dishes Fleming was <span class='blank-box' data-ans='cultivating'></span> bacteria in order to better understand them." },
+                { jp: "その皿のうち１つが汚染され、かびが生え始めていた。", en: "One of the dishes had become <span class='blank-box' data-ans='contaminated'></span> and a <span class='blank-box' data-ans='mold'></span> had started to grow." },
+                { jp: "フレミングは、このかびから細菌を殺す重要な成分を得て、それを「ペニシリン」と名付けた。", en: "From it, Fleming <span class='blank-box' data-ans='obtained'></span> the key <span class='blank-box' data-ans='bacteria-killing'></span> ingredient, which he named 'penicillin'." },
+                { jp: "ほかの2人の科学者がペニシリンについて読んで興味を持ったのは、その10年後になってようやくのことで、そのときにはフレミングは引退の準備をしていた。", en: "It was not until a decade later, when Fleming was preparing for <span class='blank-box' data-ans='retirement'></span>, that two other scientists read about penicillin and became interested." }
+            ],
+            q2_core: [
+                { def: "a cut or other puncture of the body, especially caused by a weapon such as a knife or a gun", ans: "wound" },
+                { def: "able to be used", ans: "available" },
+                { def: "the natural outer covering of a person's or animal's body", ans: "skin" }
+            ],
+            q2_extra: [
+                { def: "a room or building equipped for scientific experiments", ans: "laboratory" },
+                { def: "physical harm or damage to someone's body", ans: "injury" },
+                { def: "a particular kind of matter with uniform properties", ans: "substance" },
+                { def: "causing or able to cause death", ans: "deadly" }
+            ],
+            q3: [
+                { jp: "「私がペニシリンを発明したのではない。自然が発明したのだ。私は偶然にそれを見つけただけだ」とフレミングは言った。", en: "\"I did not invent penicillin. Nature did that. I only discovered it <span class='blank-box' data-ans='by'></span> <span class='blank-box' data-ans='accident'></span>,\" said Fleming." },
+                { jp: "「人は、探していないものを見つけることがある」とフレミングは言った。今では有名な彼の思いがけない幸運の後のことである。", en: "\"One sometimes finds what one is not looking for,\" said Fleming, following his now famous <span class='blank-box' data-ans='accidental'></span> <span class='blank-box' data-ans='discovery'></span>." },
+                { jp: "この2人の科学者、フローリーとチェーンは、彼らのチームとともに、第二次世界大戦で使用するのに間に合うようペニシリンを作るのに十分な資金を集めることができた。", en: "These scientists—Florey and Chain—along with their team were able to collect enough funding to produce penicillin <span class='blank-box' data-ans='in'></span> <span class='blank-box' data-ans='time'></span> for it to be used in World War II." }
+            ],
+            q4: [
+                { jp: "「いらない」といった相手に「どうしていらないの？」と尋ねるとき。", en: "<span class='blank-box' data-ans='Why'></span> <span class='blank-box' data-ans='not'></span>?" },
+                { jp: "「例えば誰？」と具体的に例示を求めるとき。※与えられた頭文字で始めなさい。", en: "<span class='blank-box' data-ans='Like'></span> <span class='blank-box' data-ans='who'></span>?" },
+                { jp: "あなたなら何を発明する？", en: "<span class='blank-box' data-ans='What'></span> would you <span class='blank-box' data-ans='invent'></span>?" },
+                { jp: "私のことを少しお話しします。(自己紹介)", en: "Let me tell you <span class='blank-box' data-ans='a'></span> <span class='blank-box' data-ans='little'></span> <span class='blank-box' data-ans='about'></span> <span class='blank-box' data-ans='me'></span>." },
+                { jp: "私は...ですが、~でもあります。", en: "I am ..., <span class='blank-box' data-ans='but'></span> <span class='blank-box' data-ans='also'></span> ~." },
+                { jp: "私は...できるといいなと思います。", en: "I <span class='blank-box' data-ans='hope'></span> I <span class='blank-box' data-ans='can'></span> ..." },
+                { jp: "私は...するのを楽しみにしています。", en: "I am <span class='blank-box' data-ans='looking'></span> <span class='blank-box' data-ans='forward'></span> <span class='blank-box' data-ans='to'></span> ...ing." }
+            ]
+        };
+
+        // --- LOGIC SECTION ---
+
+        let currentTab = 'reading';
+        let readingMode = 'paragraph'; // 'paragraph' | 'sentence'
+        let testMode = 'exam'; // 'exam' | 'practice'
+
+        function init() {
+            switchTab('reading');
+            renderSidebar();
+        }
+
+        // --- Navigation Logic ---
+        function switchTab(tab) {
+            currentTab = tab;
+
+            // Toggle active header buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`tab-${tab}`).classList.add('active');
+
+            // Handle content rendering and sidebar
+            const sidebar = document.getElementById('sidebar');
+            const main = document.getElementById('main-content');
+
+            if (tab === 'reading') {
+                sidebar.style.display = 'none';
+                renderReadingUI();
             } else {
-                contentArea.classList.remove('view-paragraph');
-                contentArea.classList.add('view-sentence');
+                sidebar.style.display = 'block'; // Or flex/block depending on responsive
+                renderTestUI();
             }
         }
-    </script>
 
+        // --- Reading UI Render ---
+        function renderReadingUI() {
+            const container = document.getElementById('main-content');
+            container.innerHTML = `
+                <div class="control-bar">
+                    <h2 class="page-title">Unit 7: Reading 1</h2>
+                    <div class="segmented-control">
+                        <input type="radio" name="read-mode" id="opt1" ${readingMode === 'paragraph' ? 'checked' : ''} onchange="setReadingMode('paragraph')">
+                        <label for="opt1">段落ごと</label>
+                        
+                        <input type="radio" name="read-mode" id="opt2" ${readingMode === 'sentence' ? 'checked' : ''} onchange="setReadingMode('sentence')">
+                        <label for="opt2">一文ごと</label>
+                        
+                        <div class="segmented-bg"></div>
+                    </div>
+                </div>
+                <div class="reading-content ${readingMode === 'paragraph' ? 'view-paragraph' : 'view-sentence'}">
+                    ${readingData}
+                </div>
+            `;
+        }
+
+        function setReadingMode(mode) {
+            readingMode = mode;
+            const contentDiv = document.querySelector('.reading-content');
+            if (contentDiv) {
+                contentDiv.classList.remove('view-paragraph', 'view-sentence');
+                contentDiv.classList.add(mode === 'paragraph' ? 'view-paragraph' : 'view-sentence');
+            }
+        }
+
+        // --- Test UI Render ---
+        function renderTestUI() {
+            const container = document.getElementById('main-content');
+            container.innerHTML = `
+                <div class="control-bar">
+                    <h2 class="page-title">Lesson 4 Vocab</h2>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <div class="segmented-control">
+                            <input type="radio" name="test-mode" id="opt-t1" ${testMode === 'exam' ? 'checked' : ''} onchange="setTestMode('exam')">
+                            <label for="opt-t1">本番</label>
+                            
+                            <input type="radio" name="test-mode" id="opt-t2" ${testMode === 'practice' ? 'checked' : ''} onchange="setTestMode('practice')">
+                            <label for="opt-t2">練習</label>
+                            
+                            <div class="segmented-bg"></div>
+                        </div>
+                        <button class="btn-reset" onclick="renderTestContent()">Reset</button>
+                    </div>
+                </div>
+                <div id="test-questions-area"></div>
+            `;
+            renderTestContent();
+        }
+
+        function setTestMode(mode) {
+            testMode = mode;
+            renderTestContent();
+        }
+
+        function renderTestContent() {
+            const area = document.getElementById('test-questions-area');
+            area.innerHTML = ''; // clear
+
+            // Q1
+            const q1Sec = document.createElement('div');
+            q1Sec.innerHTML = `<div class="section-title">Q1. Fill in the blanks. (From Word List)</div>`;
+            testQuestions.q1.forEach(q => q1Sec.appendChild(createQuestionBlock(q)));
+            area.appendChild(q1Sec);
+
+            // Q2
+            const q2Sec = document.createElement('div');
+            q2Sec.innerHTML = `<div class="section-title">Q2. Definition Matching.</div>`;
+            let q2Items = [...testQuestions.q2_core];
+            if (testMode === 'practice') {
+                q2Items = [...q2Items, ...testQuestions.q2_extra];
+            }
+            q2Items.forEach((item, idx) => {
+                const block = document.createElement('div');
+                block.className = 'question-block';
+                block.innerHTML = `<span class="en-text">${idx + 1}. ${item.def} <br>➔ (<span class="blank-box" data-ans="${item.ans}"></span>)</span>`;
+                q2Sec.appendChild(block);
+            });
+            area.appendChild(q2Sec);
+
+            // Q3
+            const q3Sec = document.createElement('div');
+            q3Sec.innerHTML = `<div class="section-title">Q3. Fill in the blanks. (NOT on list)</div>`;
+            testQuestions.q3.forEach(q => q3Sec.appendChild(createQuestionBlock(q)));
+            area.appendChild(q3Sec);
+
+            // Q4
+            const q4Sec = document.createElement('div');
+            q4Sec.innerHTML = `<div class="section-title">Q4. Expressions.</div>`;
+            testQuestions.q4.forEach(q => q4Sec.appendChild(createQuestionBlock(q)));
+            area.appendChild(q4Sec);
+
+            attachBlankListeners();
+        }
+
+        function createQuestionBlock(item) {
+            const div = document.createElement('div');
+            div.className = 'question-block';
+            div.innerHTML = `
+                <span class="jp-text">${item.jp}</span>
+                <span class="en-text">${item.en}</span>
+            `;
+            return div;
+        }
+
+        function attachBlankListeners() {
+            document.querySelectorAll('.blank-box').forEach(box => {
+                box.addEventListener('click', function () {
+                    if (!this.classList.contains('revealed')) {
+                        this.textContent = this.getAttribute('data-ans');
+                        this.classList.add('revealed');
+                    }
+                });
+            });
+        }
+
+        // --- Sidebar Render ---
+        function renderSidebar() {
+            const listContainer = document.getElementById('word-list-container');
+            listContainer.innerHTML = '';
+            // localeCompareを使用して大文字小文字を区別しない正確な辞書順ソートを実装
+            testWordList.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())).forEach(word => {
+                const div = document.createElement('div');
+                div.className = 'word-list-item';
+                div.textContent = word;
+                listContainer.appendChild(div);
+            });
+        }
+
+        // Start
+        init();
+
+    </script>
 </body>
 
 </html>
