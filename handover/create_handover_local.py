@@ -5,7 +5,7 @@ import google.generativeai as genai
 # ==========================================
 # 設定エリア
 # ==========================================
-API_KEY = "AIzaSyDmFvm0vje2LJuxCPP79AwGJxRlRKMNspY"  # ここにキーを入れる
+API_KEY = ""  # ここにキーを入れる
 PDF_FOLDER_PATH = "./handover_docs" # PDFが入っているローカルフォルダのパス
 MODEL_NAME = "gemini-2.5-flash-lite"
 
